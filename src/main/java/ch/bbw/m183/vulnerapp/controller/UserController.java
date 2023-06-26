@@ -1,27 +1,29 @@
 package ch.bbw.m183.vulnerapp.controller;
 
-import java.util.Base64;
-
 import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
 import ch.bbw.m183.vulnerapp.service.LoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
-	private final LoginService loginService;
+    private final LoginService loginService;
 
-	@GetMapping("/whoami")
-	public ResponseEntity<UserEntity> whoami(@RequestHeader("Authorization") String basicAuth) {
-		var usernamePassword = new String(Base64.getDecoder().decode(basicAuth.substring("Basic ".length())));
-		var arr = usernamePassword.split(":", 2);
-		return loginService.whoami(arr[0], arr[1]);
-	}
+    @GetMapping("/whoami")
+    public UserEntity whoami(@AuthenticationPrincipal User user, HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        log.info("Token: {}={}", csrfToken.getHeaderName(), csrfToken.getToken());
+        return loginService.whoami(user.getUsername());
+    }
 }

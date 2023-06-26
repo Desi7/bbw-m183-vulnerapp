@@ -34,6 +34,8 @@ function onBlogSubmit(event) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": window.sessionStorage.getItem("token"),
+            "X-XSRF-TOKEN": csrfToken,
         },
         body: JSON.stringify(data),
     }).then(filterOk)
