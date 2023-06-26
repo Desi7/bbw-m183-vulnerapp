@@ -21,9 +21,9 @@ public class UserController {
     private final LoginService loginService;
 
     @GetMapping("/whoami")
-    public UserEntity whoami(@AuthenticationPrincipal User user, HttpServletRequest request) {
+    public UserEntity whoami(@AuthenticationPrincipal String user, HttpServletRequest request) {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
         log.info("Token: {}={}", csrfToken.getHeaderName(), csrfToken.getToken());
-        return loginService.whoami(user.getUsername());
+        return loginService.whoami(user);
     }
 }

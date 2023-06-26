@@ -15,17 +15,20 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
-    UserDetailsVulnerapp userDetail;
+    UserDetailsVulnerapp userDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        UserDetails user = userDetail.loadUserByUsername(name);
+        UserDetails user = userDetailsService.loadUserByUsername(name);
         if (user == null || !new BCryptPasswordEncoder().matches(password, user.getPassword())) {
-            throw new BadCredentialsException("invalid_username_or_pass");
+            throw new BadCredentialsException("Invalid_username_or_password");
         }
+
+        // use the credentials
+        // and authenticate against the third-party system
         return new UsernamePasswordAuthenticationToken(
                 user.getUsername(), user.getPassword(), user.getAuthorities());
     }

@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,7 @@ import java.util.List;
 @Accessors(chain = true)
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class UserEntity implements UserDetails {
 
     @Id
     @Email
@@ -36,8 +37,7 @@ public class UserEntity {
 
     @Column
     @NotBlank(message = "Your password is mandatory!")
-    @Length(min = 7, max = 100, message = "Your Password has to be at least 7 characters long, and within 20 characters.")
-    //ToDo: wie hoch denn noch?! Bei der @Length Annotation muss ich das Passwort so hoch setzten damit das gehashte Passwort den Anforderungen entspeicht
+    @Length(min = 7, message = "Your Password has to be at least 7 characters long.")
     String password;
 
     @Column
@@ -54,5 +54,25 @@ public class UserEntity {
         }
 
         return list;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

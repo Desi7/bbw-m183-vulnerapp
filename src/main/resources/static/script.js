@@ -16,7 +16,10 @@ function onLoginSubmit(event) {
         },
     }).then(filterOk)
         .then(response => response.json())
-        .then(user => window.sessionStorage.setItem("fullname", user.fullname))
+        .then(user => {
+            window.sessionStorage.setItem("fullname", user.fullname)
+            window.sessionStorage.setItem("authorization", "Basic " + btoa(username + ":" + password))
+        })
         .then(() => loginCheck());
 }
 
@@ -24,6 +27,7 @@ function onLogoutSubmit(event) {
     event.preventDefault();
     fetch("/logout")
         .then(() => window.sessionStorage.removeItem("fullname"))
+        .then(() => window.sessionStorage.setItem("token", null))
         .then(() => loginCheck());
 }
 
@@ -35,7 +39,7 @@ function onBlogSubmit(event) {
         headers: {
             "Content-Type": "application/json",
             "Authorization": window.sessionStorage.getItem("token"),
-            "X-XSRF-TOKEN": csrfToken,
+            "X-XSRF-TOKEN": value.split(`; ${'XSRF-TOKEN'}=`)[1],
         },
         body: JSON.stringify(data),
     }).then(filterOk)
@@ -70,7 +74,7 @@ function renderBlogs(blogs) {
 }
 
 function filterOk(response) {
-    if(response.ok) {
+    if (response.ok) {
         return response;
     }
     return Promise.reject(response);
